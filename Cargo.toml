@@ -1,0 +1,40 @@
+[package]
+name = "nari"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+twilight-gateway = { version = "0.15", optional = true }
+twilight-cache-inmemory = { version = "0.15", optional = true }
+twilight-http = { version = "0.15", optional = true }
+twilight-model = { version = "0.15", optional = true }
+twilight-standby = { version = "0.15", optional = true }
+twilight-util = { version = "0.15", optional = true, features = [ "builder" ] }
+tracing-subscriber = { version = "0.3.16", optional = true }
+
+tracing = "0.1"
+tokio = { version = "1.25", features = ["macros", "rt-multi-thread"], optional = true }
+dotenv = { version = "0.15", optional = true }
+
+
+
+[features]
+nyari-deps = [ 
+    "twilight-gateway",
+    "twilight-cache-inmemory", 
+    "twilight-http", 
+    "twilight-model", 
+    "twilight-standby", 
+    "twilight-util", 
+    "tracing-subscriber",
+    "tokio", 
+    "dotenv",
+    ]
+
+[[bin]]
+name = "nyari"
+path = "src/bin/nyari/main.rs"
+required-features = ["nyari-deps"]
