@@ -7,12 +7,7 @@ edition = "2021"
 
 [dependencies]
 
-twilight-gateway = { version = "0.15", optional = true }
-twilight-cache-inmemory = { version = "0.15", optional = true }
-twilight-http = { version = "0.15", optional = true }
-twilight-model = { version = "0.15", optional = true }
-twilight-standby = { version = "0.15", optional = true }
-twilight-util = { version = "0.15", optional = true, features = [ "builder" ] }
+serenity = { version = "0.11", optional = true }
 tracing-subscriber = { version = "0.3.16", optional = true }
 
 tracing = "0.1"
@@ -23,14 +18,9 @@ dotenv = { version = "0.15", optional = true }
 
 [features]
 nyari-deps = [ 
-    "twilight-gateway",
-    "twilight-cache-inmemory", 
-    "twilight-http", 
-    "twilight-model", 
-    "twilight-standby", 
-    "twilight-util", 
+    "serenity",
     "tracing-subscriber",
-    "tokio", 
+    "tokio",
     "dotenv",
     ]
 
