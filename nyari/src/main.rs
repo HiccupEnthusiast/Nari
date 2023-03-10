@@ -11,8 +11,8 @@ use serenity::{
     Client,
 };
 
-use crate::commands::hello::HELLO_COMMAND;
-use crate::commands::ping::PING_COMMAND;
+use crate::commands::status::HELLO_COMMAND;
+use crate::commands::status::PING_COMMAND;
 
 #[group]
 #[commands(ping, hello)]
@@ -28,7 +28,6 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
     dotenv::dotenv().expect("Failed to load .env file");
     let token = env::var("DISCORD_TOKEN").expect("Expected DISCORD_TOKEN in environment variables");
 
