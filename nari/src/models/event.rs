@@ -130,7 +130,7 @@ impl EventListener {
             let (tx, rx) = std::sync::mpsc::channel();
             let mut w = RecommendedWatcher::new(tx, notify::Config::default()).unwrap();
             w.watch(
-                Path::new("./db/event_cache.bin"),
+                Path::new("./db/event_cache.ron"),
                 notify::RecursiveMode::Recursive,
             )
             .unwrap();
