@@ -11,3 +11,6 @@ tokio = { version = "1.25", features = [ "rt", "time", "sync" ]}
 ron = "0.8"
 notify = { version = "5.1", default-features = false }
 file-lock = "2.1"
+
+[dev-dependencies]
+tokio = { version = "1.25", features = [ "macros", "rt-multi-thread" ]}
