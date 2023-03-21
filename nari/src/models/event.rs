@@ -1,13 +1,14 @@
 use std::{
     collections::{BTreeMap, HashSet},
     fs::File,
-    io::BufReader,
+    io::{BufReader, Read},
     path::Path,
     sync::{Arc, Mutex},
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use notify::{RecommendedWatcher, Watcher};
+use file_lock::{FileLock, FileOptions};
+use notify::{event::ModifyKind::Data, EventKind, RecommendedWatcher, Watcher};
 use serde::{Deserialize, Serialize};
 use tokio::{
     sync::mpsc,
@@ -119,13 +120,16 @@ impl EventListener {
     }
     pub async fn start(self) {
         // this may look dirty, cuz it is, please send help, i am not fit for this
-        let reader = File::open("./db/event_cache.ron").unwrap();
-        let event_cache: BTreeMap<u64, u64> = ron::de::from_reader(reader).unwrap();
+        let options = FileOptions::new().read(true).write(true).create(true);
+        let mut filelock = FileLock::lock("./db/event_cache.ron", true, options).unwrap();
+        let mut bytes = vec![];
+        filelock.file.read_to_end(&mut bytes).unwrap();
+        let event_cache: BTreeMap<u64, u64> = ron::de::from_bytes(&bytes).unwrap();
         let event_cache = Arc::new(Mutex::new(event_cache));
         let copy = Arc::clone(&event_cache);
 
         let _watcher = tokio::spawn(async move {
-            let event_cach = Arc::clone(&event_cache);
+            let event_cache = Arc::clone(&event_cache);
 
             let (tx, rx) = std::sync::mpsc::channel();
             let mut w = RecommendedWatcher::new(tx, notify::Config::default()).unwrap();
@@ -134,9 +138,22 @@ impl EventListener {
                 notify::RecursiveMode::Recursive,
             )
             .unwrap();
-            while let Ok(_) = rx.recv() {
-                let reader = File::open("./db/event_cache.ron").unwrap();
-                *event_cach.lock().unwrap() = ron::de::from_reader(reader).unwrap();
+            while let Ok(f_ev) = rx.recv() {
+                if let Ok(file_event) = f_ev {
+                    match file_event.kind {
+                        EventKind::Modify(Data(_)) => {
+                            let options = FileOptions::new().read(true).write(true).create(true);
+                            let mut filelock =
+                                FileLock::lock("./db/event_cache.ron", true, options).unwrap();
+                            let mut bytes = vec![];
+                            filelock.file.read_to_end(&mut bytes).unwrap();
+                            let mut event_cache = event_cache.lock().unwrap();
+                            *event_cache =
+                                ron::de::from_bytes::<BTreeMap<u64, u64>>(&bytes).unwrap();
+                        }
+                        _ => (),
+                    }
+                }
             }
         });
         let mut interval = interval(Duration::from_millis(self.refresh_rate));

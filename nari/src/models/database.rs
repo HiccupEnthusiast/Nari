@@ -1,8 +1,10 @@
+use file_lock::{FileLock, FileOptions};
+
 use super::{event::Event, event::EventBuilder, EventId, User, UserId};
 use std::{
     collections::{BTreeMap, HashSet},
     fs::{create_dir_all, File},
-    io::{self, BufReader, BufWriter},
+    io::{self, BufReader, BufWriter, Read},
     path::{Path, PathBuf},
 };
 
@@ -25,8 +27,6 @@ impl Database {
             let buf = BufWriter::new(f);
             let mut tree: BTreeMap<u64, u64> = BTreeMap::new();
             tree.insert(u64::MAX, 0);
-            tree.insert(u64::MAX - 1, 0);
-            tree.insert(u64::MAX - 2, 0);
             ron::ser::to_writer(buf, &tree).unwrap();
         }
 
@@ -134,13 +134,20 @@ impl Database {
         Ok(BufWriter::new(File::create(path)?))
     }
     fn add_event_to_cache(&self, ev: &Event) {
-        let f = File::open(self.base_path.join("event_cache.ron")).unwrap();
-        let reader = BufReader::new(&f);
-        let mut tree: BTreeMap<u64, u64> = ron::de::from_reader(reader).unwrap();
+        let options = FileOptions::new().read(true).write(true).create(true);
+        let mut filelock =
+            FileLock::lock(self.base_path.join("event_cache.ron"), true, options).unwrap();
+
+        let mut bytes = vec![];
+        filelock.file.read_to_end(&mut bytes).unwrap();
+        let mut tree: BTreeMap<u64, u64> = ron::de::from_bytes(&bytes).unwrap();
         tree.insert(ev.next_occurence, ev.id.0);
 
-        let f = File::create(self.base_path.join("event_cache.ron")).unwrap();
-        let writer = BufWriter::new(&f);
+        let options = FileOptions::new().truncate(true).write(true).create(true);
+        let filelock =
+            FileLock::lock(self.base_path.join("event_cache.ron"), true, options).unwrap();
+
+        let writer = BufWriter::new(&filelock.file);
         ron::ser::to_writer(writer, &tree).unwrap()
     }
 }
