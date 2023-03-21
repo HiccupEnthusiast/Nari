@@ -81,8 +81,13 @@ impl EventBuilder {
         self.description = String::from(desc);
         self
     }
-    pub fn users(mut self, users: HashSet<UserId>) -> Self {
-        self.users = users;
+    pub fn users<I>(mut self, users: I) -> Self
+    where
+        I: IntoIterator<Item = UserId>,
+    {
+        for user in users {
+            self.users.insert(user);
+        }
         self
     }
     pub fn repeats(mut self, repeats: Repeatability) -> Self {

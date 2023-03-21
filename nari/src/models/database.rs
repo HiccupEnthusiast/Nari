@@ -2,7 +2,7 @@ use file_lock::{FileLock, FileOptions};
 
 use super::{event::Event, event::EventBuilder, EventId, User, UserId};
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::BTreeMap,
     fs::{create_dir_all, File},
     io::{self, BufReader, BufWriter, Read},
     path::{Path, PathBuf},
@@ -83,7 +83,10 @@ impl Database {
         let buf = self.open_buf_writer(event.id.0, "events").unwrap();
         ron::ser::to_writer(buf, &event).unwrap()
     }
-    pub fn add_user_to_events(&self, mut user: User, events: HashSet<Event>) {
+    pub fn add_user_to_events<I>(&self, mut user: User, events: I)
+    where
+        I: IntoIterator<Item = Event>,
+    {
         for mut e in events {
             self.add_event_to_cache(&e);
             e.users.insert(user.id);
