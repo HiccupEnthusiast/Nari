@@ -69,9 +69,9 @@ pub struct EventBuilder {
     priority: Priority,
 }
 impl EventBuilder {
-    pub fn new(id: u64, name: &str, next_occurence: u64) -> Self {
+    pub fn new(id: EventId, name: &str, next_occurence: u64) -> Self {
         Self {
-            id: EventId(id),
+            id,
             name: String::from(name),
             next_occurence,
             ..Self::default()

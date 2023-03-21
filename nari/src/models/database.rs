@@ -47,7 +47,7 @@ impl Database {
     }
 
     pub fn build_event(&self, id: EventId, name: &str, next_occurence: u64) -> EventBuilder {
-        EventBuilder::new(id.0, name, next_occurence)
+        EventBuilder::new(id, name, next_occurence)
     }
     pub fn add_event(&self, event: Event) {
         self.add_event_to_cache(&event);
