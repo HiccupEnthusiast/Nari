@@ -16,7 +16,7 @@ impl Database {
     where
         P: AsRef<Path>,
     {
-        let base_path = base_path.as_ref().join("db");
+        let base_path = base_path.as_ref().to_path_buf();
         create_dir_all(base_path.join("users"))?;
         create_dir_all(base_path.join("events"))?;
         if let Ok(f) = File::options()
