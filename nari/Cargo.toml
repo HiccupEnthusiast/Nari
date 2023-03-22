@@ -3,6 +3,13 @@ name = "nari"
 version = "0.2.1"
 edition = "2021"
 
+description = "Nari is a crate aimed to provide different productivity tools to your application."
+license = "MIT"
+homepage = "https://github.com/HiccupEnthusiast/Nari"
+repository = "https://github.com/HiccupEnthusiast/Nari/tree/main/nari"
+documentation = "https://docs.rs/nari"
+keywords = ["productivity", "teamwork", "future", "coordination"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
