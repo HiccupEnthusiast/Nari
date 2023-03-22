@@ -32,6 +32,12 @@ impl Event {
         db.add_event(self);
     }
 }
+impl PartialEq for Event {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+impl Eq for Event {}
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub enum Repeatability {
